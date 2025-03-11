@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>アニメ制作 同時進行スケジュール：3月スタート→6月15日納品</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+    }
+    
+    body {
+      background-color: #f8fafc;
+      color: #334155;
+      line-height: 1.4;
+      font-size: 14px;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+    }
+    
+    .container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
+      color: white;
+      border-radius: 0 0 12px 12px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    
+    .title-container h1 {
+      font-size: 28px;
+      font-weight: 700;
+      background: linear-gradient(to right, #ffffff, #dbeafe);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 4px;
+    }
+    
+    .title-container h2 {
+      font-size: 16px;
+      color: #dbeafe;
+      font-weight: 400;
+    }
+    
+    .header-right {
+      text-align: right;
+      font-size: 14px;
+    }
+    
+    .date {
+      margin-bottom: 4px;
+      color: #dbeafe;
+    }
+    
+    .reference {
+      font-style: italic;
+      color: #bfdbfe;
+      font-size: 12px;
+    }
+    
+    main {
+      display: flex;
+      flex: 1;
+      padding: 16px;
+      gap: 16px;
+      overflow: hidden;
+    }
+    
+    .left-column {
+      flex: 6;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      overflow-y: auto;
+      padding-right: 8px;
+    }
+    
+    .right-column {
+      flex: 4;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      overflow-y: auto;
+      padding-right: 8px;
+    }
+    
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      padding: 16px;
+      height: auto;
+    }
+    
+    .section-title {
+      font-size: 18px;
+      color: #1e40af;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .section-title i {
+      color: #2563eb;
+    }
+    
+    .conclusion-box {
+      background-color: #ecfdf5;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+      border-left: 4px solid #10b981;
+    }
+    
+    .conclusion-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #10b981;
+      margin-bottom: 8px;
+    }
+    
+    .conclusion-text {
+      font-weight: 600;
+      font-size: 15px;
+    }
+    
+    .timeline {
+      margin: 24px 0;
+      position: relative;
+    }
+    
+    .timeline-line {
+      position: absolute;
+      top: 16px;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(to right, #2563eb, #10b981);
+      z-index: 1;
+    }
+    
+    .timeline-months {
+      display: flex;
+      position: relative;
+      z-index: 2;
+    }
+    
+    .timeline-month {
+      flex: 1;
+      text-align: center;
+      padding-top: 16px;
+      position: relative;
+    }
+    
+    .timeline-month::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #2563eb;
+    }
+    
+    .timeline-month:last-child::before {
+      background-color: #10b981;
+    }
+    
+    .month-name {
+      font-weight: 600;
+      color: #1e40af;
+      margin-bottom: 4px;
+    }
+    
+    .month-task {
+      font-size: 12px;
+      color: #475569;
+      padding: 0 8px;
+    }
+    
+    .schedule-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+    }
+    
+    .schedule-table th {
+      text-align: left;
+      padding: 10px;
+      background-color: #e0e7ff;
+      color: #1e40af;
+      font-weight: 600;
+      font-size: 13px;
+    }
+    
+    .schedule-table td {
+      padding: 12px 10px;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 13px;
+      vertical-align: top;
+    }
+    
+    .schedule-table tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .date-column {
+      width: 25%;
+      font-weight: 600;
+      color: #334155;
+    }
+    
+    .task-column {
+      width: 75%;
+    }
+    
+    .task-list {
+      list-style-type: none;
+    }
+    
+    .task-list li {
+      margin-bottom: 6px;
+      position: relative;
+      padding-left: 20px;
+    }
+    
+    .task-list li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: #2563eb;
+      font-weight: 600;
+    }
+    
+    .task-list li:last-child {
+      margin-bottom: 0;
+    }
+    
+    .warning-box {
+      background-color: #fef2f2;
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 16px;
+      border-left: 4px solid #ef4444;
+    }
+    
+    .warning-title {
+      font-weight: 600;
+      color: #ef4444;
+      margin-bottom: 8px;
+    }
+    
+    .highlight-text {
+      color: #2563eb;
+      font-weight: 600;
+    }
+    
+    .success-text {
+      color: #10b981;
+      font-weight: 600;
+    }
+    
+    .danger-text {
+      color: #ef4444;
+      font-weight: 600;
+    }
+    
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 24px;
+      background-color: #1e3a8a;
+      color: white;
+      font-size: 12px;
+      margin-top: auto;
+    }
+    
+    .logo {
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    
+    .footer-reference {
+      font-style: italic;
+      opacity: 0.8;
+    }
+    
+    /* For webkit browsers */
+    .left-column::-webkit-scrollbar,
+    .right-column::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .left-column::-webkit-scrollbar-track,
+    .right-column::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 3px;
+    }
+    
+    .left-column::-webkit-scrollbar-thumb,
+    .right-column::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 3px;
+    }
+    
+    .left-column::-webkit-scrollbar-thumb:hover,
+    .right-column::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    
+    /* 同時進行スケジュール用スタイル */
+    .parallel-schedule-container {
+      margin-top: 20px;
+      position: relative;
+    }
+    
+    .weeks-header {
+      display: flex;
+      margin-left: 120px;
+      position: relative;
+      z-index: 10;
+    }
+    
+    .week-cell {
+      flex: 1;
+      text-align: center;
+      font-weight: 600;
+      font-size: 11px;
+      color: #475569;
+      border-right: 1px dashed #cbd5e1;
+      padding: 4px 2px;
+    }
+    
+    .week-cell:last-child {
+      border-right: none;
+    }
+    
+    .month-indicator {
+      display: flex;
+      margin-left: 120px;
+      border-bottom: 1px solid #94a3b8;
+    }
+    
+    .month-cell {
+      font-weight: 600;
+      font-size: 12px;
+      color: #1e40af;
+      text-align: center;
+      padding: 4px 0;
+    }
+    
+    .month-march {
+      flex: 0 0 21.33%;
+      border-right: 2px solid #94a3b8;
+    }
+    
+    .month-april {
+      flex: 0 0 30%;
+      border-right: 2px solid #94a3b8;
+    }
+    
+    .month-may {
+      flex: 0 0 31.33%;
+      border-right: 2px solid #94a3b8;
+    }
+    
+    .month-june {
+      flex: 0 0 17.33%;
+    }
+    
+    .process-row {
+      display: flex;
+      height: 50px;
+      margin-bottom: 10px;
+      align-items: center;
+      position: relative;
+    }
+    
+    .process-label {
+      flex: 0 0 120px;
+      font-weight: 600;
+      color: #334155;
+      padding-right: 10px;
+    }
+    
+    .process-timeline {
+      flex: 1;
+      height: 30px;
+      position: relative;
+      background-color: #f1f5f9;
+      border-radius: 4px;
+    }
+    
+    .process-bar {
+      position: absolute;
+      top: 0;
+      height: 100%;
+      border-radius: 4px;
+      color: white;
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .milestone-marker {
+      position: absolute;
+      top: -15px;
+      width: 2px;
+      height: 15px;
+      background-color: #ef4444;
+    }
+    
+    .milestone-marker::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -4px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: #ef4444;
+    }
+    
+    .milestone-label {
+      position: absolute;
+      top: -30px;
+      transform: translateX(-50%);
+      font-size: 11px;
+      font-weight: 600;
+      color: #ef4444;
+      white-space: nowrap;
+    }
+    
+    .timeline-grid {
+      position: absolute;
+      top: 0;
+      left: 120px;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      pointer-events: none;
+    }
+    
+    .timeline-grid-cell {
+      flex: 1;
+      border-right: 1px dashed #cbd5e1;
+    }
+    
+    .timeline-grid-cell:last-child {
+      border-right: none;
+    }
+    
+    .bar-scenario {
+      left: 0%;
+      width: 6.66%;
+      background-color: #2563eb;
+    }
+    
+    .bar-storyboard {
+      left: 6.66%;
+      width: 20%;
+      background-color: #7c3aed;
+    }
+    
+    .bar-layout {
+      left: 13.33%;
+      width: 20%;
+      background-color: #8b5cf6;
+    }
+    
+    .bar-background {
+      left: 20%;
+      width: 33.33%;
+      background-color: #06b6d4;
+    }
+    
+    .bar-key-animation {
+      left: 26.66%;
+      width: 33.33%;
+      background-color: #db2777;
+    }
+    
+    .bar-inbetween {
+      left: 40%;
+      width: 26.66%;
+      background-color: #e11d48;
+    }
+    
+    .bar-coloring {
+      left: 53.33%;
+      width: 20%;
+      background-color: #f59e0b;
+    }
+    
+    .bar-composite {
+      left: 66.66%;
+      width: 13.33%;
+      background-color: #84cc16;
+    }
+    
+    .bar-dubbing {
+      left: 73.33%;
+      width: 10%;
+      background-color: #14b8a6;
+    }
+    
+    .bar-sound {
+      left: 80%;
+      width: 10%;
+      background-color: #0ea5e9;
+    }
+    
+    .bar-editing {
+      left: 86.66%;
+      width: 10%;
+      background-color: #8b5cf6;
+    }
+    
+    .bar-delivery {
+      left: 96.66%;
+      width: 3.33%;
+      background-color: #10b981;
+    }
+    
+    /* リテイク用スタイル */
+    .bar-retake-1 {
+      left: 20%;
+      width: 6.66%;
+      background-color: #9333ea;
+      background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(255,255,255,0.2) 5px, rgba(255,255,255,0.2) 10px);
+    }
+    
+    .bar-retake-2 {
+      left: 46.66%;
+      width: 6.66%;
+      background-color: #9333ea;
+      background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(255,255,255,0.2) 5px, rgba(255,255,255,0.2) 10px);
+    }
+    
+    .bar-retake-3 {
+      left: 73.33%;
+      width: 6.66%;
+      background-color: #9333ea;
+      background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(255,255,255,0.2) 5px, rgba(255,255,255,0.2) 10px);
+    }
+    
+    .bar-retake-4 {
+      left: 86.66%;
+      width: 6.66%;
+      background-color: #9333ea;
+      background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(255,255,255,0.2) 5px, rgba(255,255,255,0.2) 10px);
+    }
+    
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #f1f5f9;
+      border-radius: 8px;
+    }
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+    }
+    
+    .legend-color {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+    }
+    
+    .legend-retake {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      background-color: #9333ea;
+      background-image: repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(255,255,255,0.2) 3px, rgba(255,255,255,0.2) 6px);
+    }
+    
+    .ai-tools {
+      margin-top: 16px;
+    }
+    
+    .ai-tool {
+      display: flex;
+      margin-bottom: 12px;
+      background-color: #f1f5f9;
+      border-radius: 8px;
+      padding: 12px;
+    }
+    
+    .ai-tool:last-child {
+      margin-bottom: 0;
+    }
+    
+    .ai-tool-icon {
+      flex: 0 0 40px;
+      height: 40px;
+      border-radius: 8px;
+      background-color: #dbeafe;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #2563eb;
+      font-weight: 600;
+      margin-right: 12px;
+    }
+    
+    .ai-tool-content {
+      flex: 1;
+    }
+    
+    .ai-tool-name {
+      font-weight: 600;
+      color: #1e40af;
+      margin-bottom: 4px;
+    }
+    
+    .parallel-focus-container {
+      margin-top: 20px;
+    }
+    
+    .parallel-focus-title {
+      font-weight: 600;
+      color: #1e40af;
+      margin-bottom: 12px;
+      font-size: 15px;
+    }
+    
+    .focus-period {
+      background-color: #f1f5f9;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+    
+    .focus-period:last-child {
+      margin-bottom: 0;
+    }
+    
+    .focus-period-title {
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .focus-period-title::before {
+      content: "▶";
+      margin-right: 8px;
+      color: #2563eb;
+      font-size: 12px;
+    }
+    
+    .focus-list {
+      list-style-type: none;
+    }
+    
+    .focus-list li {
+      margin-bottom: 6px;
+      position: relative;
+      padding-left: 15px;
+      font-size: 13px;
+    }
+    
+    .focus-list li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: #2563eb;
+    }
+    
+    .focus-list li:last-child {
+      margin-bottom: 0;
+    }
+    
+    .overlap-highlight {
+      display: inline-block;
+      padding: 1px 4px;
+      background-color: #dbeafe;
+      border-radius: 3px;
+      font-weight: 600;
+      color: #1e40af;
+    }
+    
+    .milestone-indicator {
+      color: #ef4444;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="title-container">
+        <h1>アニメ制作 同時進行スケジュール：3月スタート→6月15日納品</h1>
+        <h2>マルチタスク・並行作業を活用した効率的な制作計画</h2>
+      </div>
+      <div class="header-right">
+        <div class="date">2025年3月5日</div>
+        <div class="reference">制作スケジュール管理部</div>
+      </div>
+    </header>
+    
+    <main>
+      <div class="left-column">
+        <div class="card">
+          <div class="section-title">
+            <i>📊</i> 同時進行・マルチタスク制作スケジュール
+          </div>
+          
+          <div class="conclusion-box">
+            <div class="conclusion-title">重要ポイント</div>
+            <div class="conclusion-text">3月スタートで6月15日納品するための成功の鍵は、各工程を徹底的に同時並行で進めること。前工程完了を待たずに進行可能な作業を早期に開始することで、納期を確保。クライアントからのリテイク依頼に素早く対応するための時間も確保。</div>
+          </div>
+          
+          <div class="parallel-schedule-container">
+            <!-- 月表示 -->
+            <div class="month-indicator">
+              <div class="month-cell month-march">3月</div>
+              <div class="month-cell month-april">4月</div>
+              <div class="month-cell month-may">5月</div>
+              <div class="month-cell month-june">6月</div>
+            </div>
+            
+            <!-- 週表示 -->
+            <div class="weeks-header">
+              <div class="week-cell">1週</div>
+              <div class="week-cell">2週</div>
+              <div class="week-cell">3週</div>
+              <div class="week-cell">4週</div>
+              <div class="week-cell">5週</div>
+              <div class="week-cell">6週</div>
+              <div class="week-cell">7週</div>
+              <div class="week-cell">8週</div>
+              <div class="week-cell">9週</div>
+              <div class="week-cell">10週</div>
+              <div class="week-cell">11週</div>
+              <div class="week-cell">12週</div>
+              <div class="week-cell">13週</div>
+              <div class="week-cell">14週</div>
+              <div class="week-cell">15週</div>
+            </div>
+            
+            <!-- 縦線グリッド -->
+            <div class="timeline-grid">
+              <div class="timeline-grid-cell"></div>
+              <div class="timeline-grid-cell"></div>
+              <div class="timeline-grid-cell"></div>
+              <div class="timeline-grid-cell"></div>
+              <div class="timeline-grid-cell"></div>
+              <div class="timeline-grid-cell"></div>
+              <div class="timeline-grid-cell"></div>
+              <div class="timeline-grid-cell"></div>
+              <div class="timeline-grid-cell"></div>
+              <div class="timeline-grid-cell"></div>
+              <div class="timeline-grid-cell"></div>
+              <div class="timeline-grid-cell"></div>
+              <div class="timeline-grid-cell"></div>
+              <div class="timeline-grid-cell"></div>
+              <div class="timeline-grid-cell"></div>
+            </div>
+            
+            <!-- 各工程のスケジュール -->
+            <div class="process-row">
+              <div class="process-label">シナリオ</div>
+              <div class="process-timeline">
+                <div class="process-bar bar-scenario">脚本</div>
+              </div>
+            </div>
+            
+            <div class="process-row">
+              <div class="process-label">絵コンテ</div>
+              <div class="process-timeline">
+                <div class="process-bar bar-storyboard">絵コンテ作成</div>
+              </div>
+            </div>
+            
+            <div class="process-row">
+              <div class="process-label">クライアント<br>リテイク①</div>
+              <div class="process-timeline">
+                <div class="process-bar bar-retake-1">絵コンテ修正</div>
+              </div>
+            </div>
+            
+            <div class="process-row">
+              <div class="process-label">レイアウト</div>
+              <div class="process-timeline">
+                <div class="process-bar bar-layout">レイアウト作成</div>
+                <div class="milestone-marker" style="left: 26.66%;">
+                  <div class="milestone-label">4週目：レイアウト確定</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="process-row">
+              <div class="process-label">背景美術</div>
+              <div class="process-timeline">
+                <div class="process-bar bar-background">背景作成</div>
+              </div>
+            </div>
+            
+            <div class="process-row">
+              <div class="process-label">原画</div>
+              <div class="process-timeline">
+                <div class="process-bar bar-key-animation">原画作成</div>
+              </div>
+            </div>
+            
+            <div class="process-row">
+              <div class="process-label">クライアント<br>リテイク②</div>
+              <div class="process-timeline">
+                <div class="process-bar bar-retake-2">原画修正</div>
+              </div>
+            </div>
+            
+            <div class="process-row">
+              <div class="process-label">動画（中割り）</div>
+              <div class="process-timeline">
+                <div class="process-bar bar-inbetween">AIを活用した中割り</div>
+              </div>
+            </div>
+            
+            <div class="process-row">
+              <div class="process-label">彩色</div>
+              <div class="process-timeline">
+                <div class="process-bar bar-coloring">AI彩色＋調整</div>
+              </div>
+            </div>
+            
+            <div class="process-row">
+              <div class="process-label">撮影・合成</div>
+              <div class="process-timeline">
+                <div class="process-bar bar-composite">撮影</div>
+                <div class="milestone-marker" style="left: 73.33%;">
+                  <div class="milestone-label">11週目：撮影完了</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="process-row">
+              <div class="process-label">クライアント<br>リテイク③</div>
+              <div class="process-timeline">
+                <div class="process-bar bar-retake-3">撮影後修正</div>
+              </div>
+            </div>
+            
+            <div class="process-row">
+              <div class="process-label">アフレコ</div>
+              <div class="process-timeline">
+                <div class="process-bar bar-dubbing">声優収録</div>
+              </div>
+            </div>
+            
+            <div class="process-row">
+              <div class="process-label">音響効果</div>
+              <div class="process-timeline">
+                <div class="process-bar bar-sound">SE・BGM</div>
+              </div>
+            </div>
+            
+            <div class="process-row">
+              <div class="process-label">最終編集</div>
+              <div class="process-timeline">
+                <div class="process-bar bar-editing">編集</div>
+              </div>
+            </div>
+            
+            <div class="process-row">
+              <div class="process-label">クライアント<br>リテイク④</div>
+              <div class="process-timeline">
+                <div class="process-bar bar-retake-4">最終修正</div>
+              </div>
+            </div>
+            
+            <div class="process-row">
+              <div class="process-label">納品</div>
+              <div class="process-timeline">
+                <div class="process-bar bar-delivery">納品</div>
+                <div class="milestone-marker" style="left: 100%;">
+                  <div class="milestone-label">6/15：納品</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="legend">
+            <div class="legend-item">
+              <div class="legend-color" style="background-color: #2563eb;"></div>
+              <span>シナリオ</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background-color: #7c3aed;"></div>
+              <span>絵コンテ</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-retake"></div>
+              <span>クライアントリテイク</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background-color: #8b5cf6;"></div>
+              <span>レイアウト</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background-color: #06b6d4;"></div>
+              <span>背景美術</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background-color: #db2777;"></div>
+              <span>原画</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background-color: #e11d48
